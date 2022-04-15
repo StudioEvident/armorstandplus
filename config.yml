@@ -1,0 +1,43 @@
+# Do you want to make the items able to modify armor stands
+enableItemModifiers: true
+
+# Does everyone can modify armor stands using commands
+everyonUseCommands: false
+# If on false, commands can still be executed but with the adequate permission
+
+# Here's the list of the commands and the associated item to execute them
+# If you want just some commands to not be executable with items just leave a blank string
+itemModifiers:
+  lock: "TRIPWIRE_HOOK"
+  unlock: "REDSTONE"
+  toggleuser: "PAPER"
+  copy: "WRITABLE_BOOK"
+  arms: "STICK"
+  baseplate: "SMOOTH_STONE_SLAB"
+  glow: "GLOWSTONE_DUST"
+  gravity: "FEATHER"
+  visible: "GLASS"
+
+# The radius of the glow command (in block) and the time of the glowing effect (in second)
+glowRadius: 20
+glowTime: 10
+
+# All success, errors and infos messages of the plugin
+messages:
+  # Success
+  lock-success: "§bArmor stand locked."
+  lock-add-success: "§a{NAME}§b can now use this armor stand."
+  lock-remove-success: "§a{NAME}§b can no longer use this armor stand."
+  unlock-success: "§bArmor stand unlocked."
+  command-sucess: "§bArmor stand {PROPERTY} toggled."
+  # Errors
+  error-look-at-armor-stand: "§cYou must look at an armor stand."
+  error-already-locked: "§cThis armor stand is already locked."
+  error-not-locked: "§cThis armor stand isn't locked."
+  error-not-owner: "§cThis armor stand does not belong to you."
+  error-already-has-access: "§6{NAME}§c can already use this armor stand."
+  error-already-has-no-access: "§6{NAME}§c cannot use this armor stand."
+  error-player-does-not-exist: "§cThe player §6{NAME}§c doesn't exist."
+  error-command-usage: "Use §a/asp §b[lock | unlock | arms | baseplate | glow | gravity | visible]"
+  # Infos
+  armor-stand-locked: "§bThis armor stand was locked by §a{NAME}§b."
