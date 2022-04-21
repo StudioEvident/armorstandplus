@@ -1,0 +1,57 @@
+main: fr.studioevident.armorstandplus.ArmorStandPlus
+name: ArmorStandPlus
+version: 1.0
+api-version: 1.18
+author: Studio-Evident
+commands:
+  asp:
+    description: "Modify the property you want on a armor stand."
+    usage: /asp [lock | unlock | toggleuser | copy | paste | arms | baseplate | glow | gravity | visible]
+#permissions:
+#  armorstandplus.commands.*:
+#    description: "Allow to use all the commands of this plugin."
+#    default: op
+#    children:
+#      armorstandplus.commands.lock:
+#        description: "Allow locking an owned armor stand."
+#        default: op
+#
+#      armorstandplus.commands.unlock:
+#        description: "Allow unlocking an locked armor stand."
+#        default: op
+#
+#      armorstandplus.commands.toggleuser:
+#        description: "Allow toggling access to someone on an locked armor stand."
+#        default: op
+#
+#      armorstandplus.commands.copy:
+#        description: "Allow to copy a configuration of an armor stand."
+#        default: op
+#
+#      armorstandplus.commands.paste:
+#        description: "Allow to paste a configuration of a copied armor stand."
+#        default: op
+#
+#      armorstandplus.commands.rename:
+#        description: "Allow to rename an armor stand."
+#        default: op
+#
+#      armorstandplus.commands.arms:
+#        description: "Allow toggling arms on an owned armor stand."
+#        default: op
+#
+#      armorstandplus.commands.baseplate:
+#        description: "Allow toggling base plate on an owned armor stand."
+#        default: op
+#
+#      armorstandplus.commands.glow:
+#        description: "Allow to see invisible armor stands that you owned in a configurable radius for a configurable amount of time."
+#        default: op
+#
+#      armorstandplus.commands.gravity:
+#        description: "Allow to use all the commands of this plugin."
+#        default: op
+#
+#      armorstandplus.commands.visibility: false
+#        description: "Allow to use all the commands of this plugin."
+#        default: op
