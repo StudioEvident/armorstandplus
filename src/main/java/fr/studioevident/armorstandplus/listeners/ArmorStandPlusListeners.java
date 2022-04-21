@@ -18,7 +18,10 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Collection;
 
 public class ArmorStandPlusListeners implements Listener {
     private final ArmorStandPlus plugin;
@@ -31,24 +34,68 @@ public class ArmorStandPlusListeners implements Listener {
         this.handler = handler;
     }
 
-    // Set the owner of each armor stands in the world, for now
-    // this is getting the nearest player but upgrade in coming
+    // Set the owner of an armor stand to the nearest player
     @EventHandler
-    public void onEntitySpawn(final @NotNull EntitySpawnEvent event) {
+    public void onEntitySpawn(final EntitySpawnEvent event) {
         Location location = event.getLocation();
 
-        if (!plugin.isLockable(event.getEntity())) return;
+        if (!(event.getEntity() instanceof ArmorStand)) return;
         ArmorStand armorStand = (ArmorStand)event.getEntity();
 
-        Player nearestPlayer = plugin.getNearestPlayerAround(location, 8);
+        Collection<Entity> nearbyEntities = location.getWorld().getNearbyEntities(armorStand.getLocation(), 8, 8, 8);
+        if (!(nearbyEntities.iterator().hasNext())) return;
 
-        if (nearestPlayer == null) return;
+        double distance = 10000000;
+        Entity nearby = nearbyEntities.iterator().next();
+        for (Entity e : nearbyEntities) {
+            if (e instanceof Player) {
+                Location l = e.getLocation();
+
+                double testDistance = location.distance(l);
+                if (testDistance < distance) {
+                    distance = testDistance;
+                    nearby = e;
+                }
+            }
+        }
+
+        if (!(nearby instanceof Player)) return;
+        Player nearestPlayer = (Player)nearby;
 
         storage.setArmorStandOwner(armorStand, nearestPlayer.getUniqueId());
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onArmorStandDamage(final @NotNull EntityDamageEvent event) {
+    public void onArmorStandModification(final PlayerArmorStandManipulateEvent event) {
+        Player player = event.getPlayer();
+        ArmorStand armorStand = event.getRightClicked();
+
+        if (plugin.hasAccess(player, armorStand)) {
+            EquipmentSlot slot = event.getSlot();
+
+            if (player.isSneaking()) {
+                ItemStack playerItem = event.getPlayerItem();
+                ItemStack armorStandItem = event.getRightClicked().getEquipment().getItemInOffHand();
+
+                player.getInventory().setItemInMainHand(armorStandItem);
+                armorStand.getEquipment().setItemInOffHand(playerItem);
+
+                event.setCancelled(true);
+            }
+
+            return;
+        }
+
+        if (!storage.isLocked(armorStand)) return;
+
+        plugin.sendMessage(player, "armor-stand-locked", "{NAME}", Bukkit.getOfflinePlayer(storage.getArmorStandOwner(armorStand)).getName());
+        event.setCancelled(true);
+    }
+
+    // Get when ever a locked armor stand take damage from
+    // an entity other than a player (tnt, skeleton, etc...)
+    @EventHandler(ignoreCancelled = true)
+    public void onArmorStandDamage(final EntityDamageEvent event) {
         Entity entity = event.getEntity();
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
@@ -59,24 +106,7 @@ public class ArmorStandPlusListeners implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onArmorStandModification(final @NotNull PlayerArmorStandManipulateEvent event) {
-        Player player = event.getPlayer();
-        Entity entity = event.getRightClicked();
-
-        if (!storage.isLocked(entity)) return;
-        ArmorStand armorStand = (ArmorStand)entity;
-
-        if (plugin.isOwner(player, armorStand)) {
-            // Do some sneaking actions
-            return;
-        }
-
-        plugin.sendMessage(player, "armor-stand-locked", "{NAME}", Bukkit.getOfflinePlayer(storage.getArmorStandOwner(armorStand)).getName());
-        event.setCancelled(true);
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onArmorStandDamageByEntity(final @NotNull EntityDamageByEntityEvent event) {
+    public void onArmorStandDamageByEntity(final EntityDamageByEntityEvent event) {
         Entity damagingEntity = event.getDamager();
         Entity entity = event.getEntity();
         
@@ -86,7 +116,7 @@ public class ArmorStandPlusListeners implements Listener {
         if (!(entity instanceof ArmorStand)) return;
         ArmorStand armorStand = (ArmorStand)entity;
 
-        if (plugin.isOwner(player, armorStand)) {
+        if (plugin.hasAccess(player, armorStand)) {
             Material item = player.getInventory().getItemInOffHand().getType();
 
             if (item == Material.AIR) return;
@@ -96,32 +126,35 @@ public class ArmorStandPlusListeners implements Listener {
 
             handler.doAction(player, commandToExecute, true);
             event.setCancelled(true);
+        } else {
+            if (!storage.isLocked(entity)) return;
+
+            plugin.sendMessage(player, "armor-stand-locked", "{NAME}", Bukkit.getOfflinePlayer(storage.getArmorStandOwner(armorStand)).getName());
+            event.setCancelled(true);
         }
-
-        if (!storage.isLocked(entity)) return;
-
-        plugin.sendMessage(player, "armor-stand-locked", "{NAME}", Bukkit.getOfflinePlayer(storage.getArmorStandOwner(armorStand)).getName());
-        event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onArmorStandInteraction(final @NotNull PlayerInteractAtEntityEvent event) {
+    public void onArmorStandInteraction(final PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
         Material item = player.getInventory().getItemInOffHand().getType();
 
+        // If item in offhand is not air, check is the item is associate to an action.
         if (item == Material.AIR) return;
         String commandToExecute = plugin.isModifierItem(item);
 
+        // If the item is not associate to an action, return.
         if (commandToExecute == null) return;
 
+        // Do the associate action and cancel the event.
         handler.doAction(player, commandToExecute, false);
         event.setCancelled(true);
     }
 
     // This event is only here to handle the glow command activation.
     // So players don't have to look at an INVISIBLE armor stand.
-    @EventHandler
-    public void onGlowUsedInAir(final @NotNull PlayerInteractEvent event) {
+    @EventHandler(ignoreCancelled = true)
+    public void onGlowUsedInAir(final PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
         Action action = event.getAction();
