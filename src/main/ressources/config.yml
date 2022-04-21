@@ -1,21 +1,28 @@
-# Do you want to make the items able to modify armor stands
-enableItemModifiers: true
-
-# Does everyone can modify armor stands using commands
-everyonUseCommands: false
-# If on false, commands can still be executed but with the adequate permission
-
 # Here's the list of the commands and the associated item to execute them
 # If you want just some commands to not be executable with items just leave a blank string
 itemModifiers:
+  # Locking
   lock: "TRIPWIRE_HOOK"
   unlock: "REDSTONE"
   toggleuser: "PAPER"
+  # Useful / fun
   copy: "WRITABLE_BOOK"
+  glow: "GLOWSTONE_DUST"
+  rename: "NAME_TAG"
+  # Movements
+  move: "MINECART"
+  rotate: "COMPASS"
+  # Manipulation
+  sethelmet: "IRON_HELMET"
+  head: "LEATHER_HELMET"
+  body: "LEATHER_CHESTPLATE"
+  arm: "LEVER"
+  leg: "LEATHER_LEGGINGS"
+  # Properties
   arms: "STICK"
   baseplate: "SMOOTH_STONE_SLAB"
-  glow: "GLOWSTONE_DUST"
   gravity: "FEATHER"
+  small: "PUFFERFISH"
   visible: "GLASS"
 
 # The radius of the glow command (in block) and the time of the glowing effect (in second)
@@ -29,15 +36,14 @@ messages:
   lock-add-success: "§a{NAME}§b can now use this armor stand."
   lock-remove-success: "§a{NAME}§b can no longer use this armor stand."
   unlock-success: "§bArmor stand unlocked."
-  command-sucess: "§bArmor stand {PROPERTY} toggled."
+  command-success: "§bArmor stand {PROPERTY} toggled."
   # Errors
   error-look-at-armor-stand: "§cYou must look at an armor stand."
   error-already-locked: "§cThis armor stand is already locked."
   error-not-locked: "§cThis armor stand isn't locked."
   error-not-owner: "§cThis armor stand does not belong to you."
-  error-already-has-access: "§6{NAME}§c can already use this armor stand."
-  error-already-has-no-access: "§6{NAME}§c cannot use this armor stand."
+  error-you-are-owner: "§cI can not toggle your access to this armor stand because you are the owner."
   error-player-does-not-exist: "§cThe player §6{NAME}§c doesn't exist."
-  error-command-usage: "Use §a/asp §b[lock | unlock | arms | baseplate | glow | gravity | visible]"
+  error-unknow-command: "§cThis command does not exist at all."
   # Infos
   armor-stand-locked: "§bThis armor stand was locked by §a{NAME}§b."
