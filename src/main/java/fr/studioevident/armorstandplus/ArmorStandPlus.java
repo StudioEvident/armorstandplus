@@ -49,7 +49,6 @@ public final class ArmorStandPlus extends JavaPlugin {
         }
         if (!page.equals("")) armorStandProperties.add(page);
 
-        // Set the book with all the armor stand properties
         copyMeta.setPages(armorStandProperties);
         book.setItemMeta(copyMeta);
 
