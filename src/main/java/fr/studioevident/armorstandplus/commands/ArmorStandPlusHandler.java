@@ -11,10 +11,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.EulerAngle;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ArmorStandPlusHandler {
     private final ArmorStandPlus plugin;
@@ -36,7 +33,7 @@ public class ArmorStandPlusHandler {
         }
 
         ArmorStand armorStand = (ArmorStand)targetEntity;
-        Location location = armorStand.getLocation();
+        Location location = armorStand == null ? new Location(player.getWorld(), 0, 0, 0) : armorStand.getLocation();
 
         switch (command) {
             case "lock":
@@ -131,7 +128,7 @@ public class ArmorStandPlusHandler {
                 if (Boolean.parseBoolean(booleanProps[1]) != armorStand.hasBasePlate()) armorStand.setBasePlate(Boolean.parseBoolean(booleanProps[1]));
                 if (Boolean.parseBoolean(booleanProps[2]) != armorStand.hasGravity()) armorStand.setGravity(Boolean.parseBoolean(booleanProps[2]));
                 if (Boolean.parseBoolean(booleanProps[3]) != armorStand.isSmall()) armorStand.setSmall(Boolean.parseBoolean(booleanProps[3]));
-                if (Boolean.parseBoolean(booleanProps[4]) != armorStand.isInvisible()) armorStand.setVisible(Boolean.parseBoolean(booleanProps[4]));
+                if (Boolean.parseBoolean(booleanProps[4]) != armorStand.isVisible()) armorStand.setVisible(Boolean.parseBoolean(booleanProps[4]));
 
                 String[] headPos = pasteMeta.getPage(3).split(":");
                 String[] bodyPos = pasteMeta.getPage(4).split(":");
