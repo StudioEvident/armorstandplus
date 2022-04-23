@@ -109,7 +109,7 @@ public class ArmorStandPlusListeners implements Listener {
     public void onArmorStandDamageByEntity(final EntityDamageByEntityEvent event) {
         Entity damagingEntity = event.getDamager();
         Entity entity = event.getEntity();
-        
+
         if (!(damagingEntity instanceof Player)) return;
         Player player = (Player)damagingEntity;
 
@@ -153,7 +153,7 @@ public class ArmorStandPlusListeners implements Listener {
 
     // This event is only here to handle the glow command activation.
     // So players don't have to look at an INVISIBLE armor stand.
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onGlowUsedInAir(final PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
