@@ -41,6 +41,17 @@ public final class ArmorStandPlus extends JavaPlugin {
         for(Map.Entry<String, Object> entry : configItems.getValues(true).entrySet()) {
             lines += 1;
             page += "§0• §1" + entry.getKey() + "§0: \n§8" + entry.getValue() + "\n\n";
+
+            if (entry.getKey().equals("copy")) {
+                if (lines == 5) {
+                    armorStandProperties.add(page);
+                    lines = 0;
+                    page = "";
+                }
+                lines += 1;
+                page += "§0• §1paste§0: \n§8WRITTEN_BOOK\n\n";
+            }
+
             if (lines == 5) {
                 armorStandProperties.add(page);
                 lines = 0;
