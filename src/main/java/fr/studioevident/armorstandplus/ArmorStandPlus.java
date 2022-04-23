@@ -4,19 +4,19 @@ import fr.studioevident.armorstandplus.commands.ArmorStandPlusHandler;
 import fr.studioevident.armorstandplus.listeners.ArmorStandPlusListeners;
 import fr.studioevident.armorstandplus.utils.ArmorStandPlusStorage;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public final class ArmorStandPlus extends JavaPlugin {
     private final ArmorStandPlusStorage storage = new ArmorStandPlusStorage(this);
@@ -26,6 +26,41 @@ public final class ArmorStandPlus extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new ArmorStandPlusListeners(this, storage, handler), this);
+
+        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+
+        BookMeta copyMeta = (BookMeta)book.getItemMeta();
+        copyMeta.setTitle("ArmorStandPlus Guide");
+        copyMeta.setAuthor("TheMisterObvious");
+
+        List<String> armorStandProperties = new ArrayList<>();
+        String page = "";
+        int lines = 0;
+
+        ConfigurationSection configItems = getConfig().getConfigurationSection("itemModifiers");
+        for(Map.Entry<String, Object> entry : configItems.getValues(true).entrySet()) {
+            lines += 1;
+            page += "§0• §1" + entry.getKey() + "§0: \n§8" + entry.getValue() + "\n\n";
+            if (lines == 5) {
+                armorStandProperties.add(page);
+                lines = 0;
+                page = "";
+            }
+        }
+        if (!page.equals("")) armorStandProperties.add(page);
+
+        // Set the book with all the armor stand properties
+        copyMeta.setPages(armorStandProperties);
+        book.setItemMeta(copyMeta);
+
+        NamespacedKey key = new NamespacedKey(this, "armorstandplus_book");
+
+        ShapelessRecipe recipe = new ShapelessRecipe(key, book);
+
+        recipe.addIngredient(1, Material.BOOK);
+        recipe.addIngredient(1, Material.ARMOR_STAND);
+
+        Bukkit.addRecipe(recipe);
     }
 
     public void sendMessage(Player player, String configPath, Object... parameters) {
@@ -90,6 +125,7 @@ public final class ArmorStandPlus extends JavaPlugin {
 
     public void toggleUserArmorStand(Player owner, OfflinePlayer user, ArmorStand armorStand) {
         if (!storage.isLocked(armorStand)) {
+            handler.errorParticles(armorStand);
             sendMessage(owner, "error-not-locked");
             return;
         }
@@ -98,12 +134,13 @@ public final class ArmorStandPlus extends JavaPlugin {
         List<UUID> allowedUsers = storage.getArmorStandUsers(armorStand);
         if (allowedUsers.contains(userUUID)) {
             storage.removeUser(armorStand, userUUID);
+            handler.successParticles(armorStand);
             sendMessage(owner, "lock-remove-success", "{NAME}", user.getName());
         } else {
             storage.addUser(armorStand, userUUID);
+            handler.successParticles(armorStand);
             sendMessage(owner, "lock-add-success", "{NAME}", user.getName());
         }
     }
 
 }
-
